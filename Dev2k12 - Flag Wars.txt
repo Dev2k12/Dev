@@ -1,0 +1,148 @@
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+local player = Players.LocalPlayer
+
+-- Cấu hình
+local correctPassword = "Dev2k12"
+local autoRefillEnabled = false
+local refillAmount = 0
+
+-- GUI xác thực mật khẩu
+local passwordGui = Instance.new("ScreenGui", player:WaitForChild("PlayerGui"))
+passwordGui.Name = "PasswordPrompt"
+
+local passFrame = Instance.new("Frame", passwordGui)
+passFrame.Size = UDim2.new(0, 300, 0, 140)
+passFrame.Position = UDim2.new(0.5, -150, 0.5, -70)
+passFrame.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
+passFrame.Active = true
+passFrame.Draggable = true
+
+local passLabel = Instance.new("TextLabel", passFrame)
+passLabel.Text = "Nhập mật khẩu để truy cập:"
+passLabel.Font = Enum.Font.GothamBold
+passLabel.TextSize = 16
+passLabel.TextColor3 = Color3.new(1, 1, 1)
+passLabel.BackgroundTransparency = 1
+passLabel.Size = UDim2.new(1, 0, 0, 30)
+
+local passBox = Instance.new("TextBox", passFrame)
+passBox.PlaceholderText = "Mật khẩu..."
+passBox.Font = Enum.Font.Gotham
+passBox.TextSize = 16
+passBox.Text = ""
+passBox.Size = UDim2.new(1, -20, 0, 30)
+passBox.Position = UDim2.new(0, 10, 0, 40)
+passBox.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+passBox.TextColor3 = Color3.new(1,1,1)
+passBox.ClearTextOnFocus = false
+
+local confirmButton = Instance.new("TextButton", passFrame)
+confirmButton.Text = "Xác nhận"
+confirmButton.Font = Enum.Font.GothamBold
+confirmButton.TextSize = 16
+confirmButton.Size = UDim2.new(1, -20, 0, 30)
+confirmButton.Position = UDim2.new(0, 10, 0, 90)
+confirmButton.BackgroundColor3 = Color3.fromRGB(60, 120, 255)
+confirmButton.TextColor3 = Color3.new(1,1,1)
+
+-- Hàm tạo GUI chính
+local function showMainGui()
+	local screenGui = Instance.new("ScreenGui", player:WaitForChild("PlayerGui"))
+	screenGui.Name = "Dev2k12 - Flag Wars"
+
+	local frame = Instance.new("Frame", screenGui)
+	frame.Size = UDim2.new(0, 250, 0, 160)
+	frame.Position = UDim2.new(0, 20, 0, 100)
+	frame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+	frame.Active = true
+	frame.Draggable = true
+
+	local title = Instance.new("TextLabel", frame)
+	title.Text = "Dev2k12 - Flag Wars"
+	title.Font = Enum.Font.GothamBold
+	title.TextSize = 18
+	title.TextColor3 = Color3.new(1,1,1)
+	title.Size = UDim2.new(1, 0, 0, 30)
+	title.BackgroundTransparency = 1
+
+	local inputBox = Instance.new("TextBox", frame)
+	inputBox.PlaceholderText = "Nhập số đạn"
+	inputBox.Font = Enum.Font.Gotham
+	inputBox.TextSize = 16
+	inputBox.Text = ""
+	inputBox.Size = UDim2.new(1, -20, 0, 30)
+	inputBox.Position = UDim2.new(0, 10, 0, 40)
+	inputBox.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+	inputBox.TextColor3 = Color3.new(1,1,1)
+
+	local setAmmoButton = Instance.new("TextButton", frame)
+	setAmmoButton.Text = "Cập nhật đạn"
+	setAmmoButton.Font = Enum.Font.GothamBold
+	setAmmoButton.TextSize = 16
+	setAmmoButton.Size = UDim2.new(1, -20, 0, 30)
+	setAmmoButton.Position = UDim2.new(0, 10, 0, 80)
+	setAmmoButton.BackgroundColor3 = Color3.fromRGB(60, 120, 255)
+	setAmmoButton.TextColor3 = Color3.new(1,1,1)
+
+	local toggleLoopButton = Instance.new("TextButton", frame)
+	toggleLoopButton.Text = "Loop: OFF"
+	toggleLoopButton.Font = Enum.Font.GothamBold
+	toggleLoopButton.TextSize = 16
+	toggleLoopButton.Size = UDim2.new(1, -20, 0, 30)
+	toggleLoopButton.Position = UDim2.new(0, 10, 0, 120)
+	toggleLoopButton.BackgroundColor3 = Color3.fromRGB(90, 90, 90)
+	toggleLoopButton.TextColor3 = Color3.new(1,1,1)
+
+	-- Hàm cập nhật đạn
+	local function setAmmo(ammoCount)
+		local function update(container)
+			for _, tool in pairs(container:GetChildren()) do
+				if tool:IsA("Tool") then
+					local ammo = tool:FindFirstChild("CurrentAmmo")
+					if ammo and ammo:IsA("IntValue") then
+						ammo.Value = ammoCount
+					end
+				end
+			end
+		end
+		for _, container in pairs({player.Backpack, player.Character}) do
+			if container then update(container) end
+		end
+	end
+
+	-- Cập nhật đạn
+	setAmmoButton.MouseButton1Click:Connect(function()
+		local val = tonumber(inputBox.Text)
+		if val then
+			refillAmount = val
+			setAmmo(refillAmount)
+		end
+	end)
+
+	-- Bật tắt loop
+	toggleLoopButton.MouseButton1Click:Connect(function()
+		autoRefillEnabled = not autoRefillEnabled
+		toggleLoopButton.Text = "Loop: " .. (autoRefillEnabled and "ON" or "OFF")
+		toggleLoopButton.BackgroundColor3 = autoRefillEnabled and Color3.fromRGB(60, 200, 80) or Color3.fromRGB(90, 90, 90)
+	end)
+
+	-- Loop auto refill
+	RunService.RenderStepped:Connect(function()
+		if autoRefillEnabled and refillAmount > 0 then
+			setAmmo(refillAmount)
+		end
+	end)
+end
+
+-- Xác thực mật khẩu
+confirmButton.MouseButton1Click:Connect(function()
+	if passBox.Text == correctPassword then
+		passwordGui:Destroy()
+		showMainGui()
+	else
+		passBox.Text = ""
+		passBox.PlaceholderText = "Sai mật khẩu, thử lại!"
+		passBox.PlaceholderColor3 = Color3.fromRGB(255, 100, 100)
+	end
+end)
