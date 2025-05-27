@@ -19,7 +19,7 @@ passFrame.Active = true
 passFrame.Draggable = true
 
 local passLabel = Instance.new("TextLabel", passFrame)
-passLabel.Text = "Nhập mật khẩu để truy cập:"
+passLabel.Text = "Password:"
 passLabel.Font = Enum.Font.GothamBold
 passLabel.TextSize = 16
 passLabel.TextColor3 = Color3.new(1, 1, 1)
@@ -142,7 +142,7 @@ confirmButton.MouseButton1Click:Connect(function()
 		showMainGui()
 	else
 		passBox.Text = ""
-		passBox.PlaceholderText = "Sai mật khẩu, thử lại!"
+		passBox.PlaceholderText = "Chú ý lại mật khẩu"
 		passBox.PlaceholderColor3 = Color3.fromRGB(255, 100, 100)
 	end
 end)
