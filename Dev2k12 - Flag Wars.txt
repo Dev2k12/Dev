@@ -1,13 +1,17 @@
+--\n-- Dev2k12 - Full Integrated GUI with Password & Tab Switcher\n--\n
+
 local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
 local player = Players.LocalPlayer
 
--- Cấu hình
+-- CONFIGURATION
 local correctPassword = "Dev2k12"
 local autoRefillEnabled = false
 local refillAmount = 0
+local cooldownValue = 0.1
+local autoUpdate = true
 
--- GUI xác thực mật khẩu
+-- GUI PASSWORD PROMPT
 local passwordGui = Instance.new("ScreenGui", player:WaitForChild("PlayerGui"))
 passwordGui.Name = "PasswordPrompt"
 
@@ -46,103 +50,199 @@ confirmButton.Position = UDim2.new(0, 10, 0, 90)
 confirmButton.BackgroundColor3 = Color3.fromRGB(60, 120, 255)
 confirmButton.TextColor3 = Color3.new(1,1,1)
 
--- Hàm tạo GUI chính
+-- MAIN GUI
 local function showMainGui()
-	local screenGui = Instance.new("ScreenGui", player:WaitForChild("PlayerGui"))
-	screenGui.Name = "Dev2k12 - Flag Wars"
+    local screenGui = Instance.new("ScreenGui", player:WaitForChild("PlayerGui"))
+    screenGui.Name = "Dev2k12 - Flag Wars"
 
-	local frame = Instance.new("Frame", screenGui)
-	frame.Size = UDim2.new(0, 250, 0, 160)
-	frame.Position = UDim2.new(0, 20, 0, 100)
-	frame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
-	frame.Active = true
-	frame.Draggable = true
+    local frame = Instance.new("Frame", screenGui)
+    frame.Size = UDim2.new(0, 270, 0, 240)
+    frame.Position = UDim2.new(0, 20, 0, 100)
+    frame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+    frame.Active = true
+    frame.Draggable = true
 
-	local title = Instance.new("TextLabel", frame)
-	title.Text = "Dev2k12 - Flag Wars"
-	title.Font = Enum.Font.GothamBold
-	title.TextSize = 18
-	title.TextColor3 = Color3.new(1,1,1)
-	title.Size = UDim2.new(1, 0, 0, 30)
-	title.BackgroundTransparency = 1
+    local title = Instance.new("TextLabel", frame)
+    title.Text = "Dev2k12 - Flag Wars"
+    title.Font = Enum.Font.GothamBold
+    title.TextSize = 18
+    title.TextColor3 = Color3.new(1,1,1)
+    title.Size = UDim2.new(1, 0, 0, 30)
+    title.BackgroundTransparency = 1
 
-	local inputBox = Instance.new("TextBox", frame)
-	inputBox.PlaceholderText = "Nhập số đạn"
-	inputBox.Font = Enum.Font.Gotham
-	inputBox.TextSize = 16
-	inputBox.Text = ""
-	inputBox.Size = UDim2.new(1, -20, 0, 30)
-	inputBox.Position = UDim2.new(0, 10, 0, 40)
-	inputBox.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
-	inputBox.TextColor3 = Color3.new(1,1,1)
+    local tab1Button = Instance.new("TextButton", frame)
+    tab1Button.Text = "Cooldown"
+    tab1Button.Size = UDim2.new(0.5, 0, 0, 30)
+    tab1Button.Position = UDim2.new(0, 0, 0, 30)
+    tab1Button.BackgroundColor3 = Color3.fromRGB(45, 45, 45)
+    tab1Button.TextColor3 = Color3.new(1,1,1)
 
-	local setAmmoButton = Instance.new("TextButton", frame)
-	setAmmoButton.Text = "Cập nhật đạn"
-	setAmmoButton.Font = Enum.Font.GothamBold
-	setAmmoButton.TextSize = 16
-	setAmmoButton.Size = UDim2.new(1, -20, 0, 30)
-	setAmmoButton.Position = UDim2.new(0, 10, 0, 80)
-	setAmmoButton.BackgroundColor3 = Color3.fromRGB(60, 120, 255)
-	setAmmoButton.TextColor3 = Color3.new(1,1,1)
+    local tab2Button = Instance.new("TextButton", frame)
+    tab2Button.Text = "Ammo"
+    tab2Button.Size = UDim2.new(0.5, 0, 0, 30)
+    tab2Button.Position = UDim2.new(0.5, 0, 0, 30)
+    tab2Button.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
+    tab2Button.TextColor3 = Color3.new(1,1,1)
 
-	local toggleLoopButton = Instance.new("TextButton", frame)
-	toggleLoopButton.Text = "Loop: OFF"
-	toggleLoopButton.Font = Enum.Font.GothamBold
-	toggleLoopButton.TextSize = 16
-	toggleLoopButton.Size = UDim2.new(1, -20, 0, 30)
-	toggleLoopButton.Position = UDim2.new(0, 10, 0, 120)
-	toggleLoopButton.BackgroundColor3 = Color3.fromRGB(90, 90, 90)
-	toggleLoopButton.TextColor3 = Color3.new(1,1,1)
+    local tab1 = Instance.new("Frame", frame)
+    tab1.Size = UDim2.new(1, 0, 1, -60)
+    tab1.Position = UDim2.new(0, 0, 0, 60)
+    tab1.BackgroundTransparency = 1
 
-	-- Hàm cập nhật đạn
-	local function setAmmo(ammoCount)
-		local function update(container)
-			for _, tool in pairs(container:GetChildren()) do
-				if tool:IsA("Tool") then
-					local ammo = tool:FindFirstChild("CurrentAmmo")
-					if ammo and ammo:IsA("IntValue") then
-						ammo.Value = ammoCount
-					end
-				end
-			end
-		end
-		for _, container in pairs({player.Backpack, player.Character}) do
-			if container then update(container) end
-		end
-	end
+    local inputBox1 = Instance.new("TextBox", tab1)
+    inputBox1.PlaceholderText = "Nhập cooldown (vd: 0.1)"
+    inputBox1.Font = Enum.Font.Gotham
+    inputBox1.TextSize = 16
+    inputBox1.Text = ""
+    inputBox1.Size = UDim2.new(1, -20, 0, 30)
+    inputBox1.Position = UDim2.new(0, 10, 0, 10)
+    inputBox1.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+    inputBox1.TextColor3 = Color3.new(1, 1, 1)
 
-	-- Cập nhật đạn
-	setAmmoButton.MouseButton1Click:Connect(function()
-		local val = tonumber(inputBox.Text)
-		if val then
-			refillAmount = val
-			setAmmo(refillAmount)
-		end
-	end)
+    local setButton = Instance.new("TextButton", tab1)
+    setButton.Text = "Cập nhật Cooldown"
+    setButton.Font = Enum.Font.GothamBold
+    setButton.TextSize = 16
+    setButton.Size = UDim2.new(1, -20, 0, 30)
+    setButton.Position = UDim2.new(0, 10, 0, 50)
+    setButton.BackgroundColor3 = Color3.fromRGB(60, 120, 255)
+    setButton.TextColor3 = Color3.new(1, 1, 1)
 
-	-- Bật tắt loop
-	toggleLoopButton.MouseButton1Click:Connect(function()
-		autoRefillEnabled = not autoRefillEnabled
-		toggleLoopButton.Text = "Loop: " .. (autoRefillEnabled and "ON" or "OFF")
-		toggleLoopButton.BackgroundColor3 = autoRefillEnabled and Color3.fromRGB(60, 200, 80) or Color3.fromRGB(90, 90, 90)
-	end)
+    local autoToggle = Instance.new("TextButton", tab1)
+    autoToggle.Text = "Tự động làm mới: BẬT"
+    autoToggle.Font = Enum.Font.GothamBold
+    autoToggle.TextSize = 16
+    autoToggle.Size = UDim2.new(1, -20, 0, 30)
+    autoToggle.Position = UDim2.new(0, 10, 0, 90)
+    autoToggle.BackgroundColor3 = Color3.fromRGB(60, 200, 80)
+    autoToggle.TextColor3 = Color3.new(1, 1, 1)
 
-	-- Loop auto refill
-	RunService.RenderStepped:Connect(function()
-		if autoRefillEnabled and refillAmount > 0 then
-			setAmmo(refillAmount)
-		end
-	end)
+    local tab2 = Instance.new("Frame", frame)
+    tab2.Size = UDim2.new(1, 0, 1, -60)
+    tab2.Position = UDim2.new(0, 0, 0, 60)
+    tab2.BackgroundTransparency = 1
+    tab2.Visible = false
+
+    local inputBox2 = Instance.new("TextBox", tab2)
+    inputBox2.PlaceholderText = "Nhập số đạn"
+    inputBox2.Font = Enum.Font.Gotham
+    inputBox2.TextSize = 16
+    inputBox2.Text = ""
+    inputBox2.Size = UDim2.new(1, -20, 0, 30)
+    inputBox2.Position = UDim2.new(0, 10, 0, 10)
+    inputBox2.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+    inputBox2.TextColor3 = Color3.new(1,1,1)
+
+    local setAmmoButton = Instance.new("TextButton", tab2)
+    setAmmoButton.Text = "Cập nhật đạn"
+    setAmmoButton.Font = Enum.Font.GothamBold
+    setAmmoButton.TextSize = 16
+    setAmmoButton.Size = UDim2.new(1, -20, 0, 30)
+    setAmmoButton.Position = UDim2.new(0, 10, 0, 50)
+    setAmmoButton.BackgroundColor3 = Color3.fromRGB(60, 120, 255)
+    setAmmoButton.TextColor3 = Color3.new(1,1,1)
+
+    local toggleLoopButton = Instance.new("TextButton", tab2)
+    toggleLoopButton.Text = "Tự động làm mới: TẮT"
+    toggleLoopButton.Font = Enum.Font.GothamBold
+    toggleLoopButton.TextSize = 16
+    toggleLoopButton.Size = UDim2.new(1, -20, 0, 30)
+    toggleLoopButton.Position = UDim2.new(0, 10, 0, 90)
+    toggleLoopButton.BackgroundColor3 = Color3.fromRGB(90, 90, 90)
+    toggleLoopButton.TextColor3 = Color3.new(1,1,1)
+
+    -- Functions
+    local function setCooldown(amount)
+        for _, container in pairs({player.Backpack, player.Character}) do
+            for _, tool in pairs(container:GetChildren()) do
+                local config = tool:FindFirstChild("Configuration")
+                if config then
+                    local cooldown = config:FindFirstChild("ShotCooldown") or config:FindFirstChild("ShootCooldown")
+                    if cooldown and cooldown:IsA("NumberValue") then
+                        cooldown.Value = amount
+                    end
+                end
+            end
+        end
+    end
+
+    local function setAmmo(ammoCount)
+        for _, container in pairs({player.Backpack, player.Character}) do
+            for _, tool in pairs(container:GetChildren()) do
+                if tool:IsA("Tool") then
+                    local ammo = tool:FindFirstChild("CurrentAmmo")
+                    if ammo and ammo:IsA("IntValue") then
+                        ammo.Value = ammoCount
+                    end
+                end
+            end
+        end
+    end
+
+    setButton.MouseButton1Click:Connect(function()
+        local val = tonumber(inputBox1.Text)
+        if val then
+            cooldownValue = val
+            setCooldown(cooldownValue)
+        end
+    end)
+
+    autoToggle.MouseButton1Click:Connect(function()
+        autoUpdate = not autoUpdate
+        autoToggle.Text = "Tự động làm mới: " .. (autoUpdate and "BẬT" or "TẮT")
+        autoToggle.BackgroundColor3 = autoUpdate and Color3.fromRGB(60, 200, 80) or Color3.fromRGB(90, 90, 90)
+    end)
+
+    setAmmoButton.MouseButton1Click:Connect(function()
+        local val = tonumber(inputBox2.Text)
+        if val then
+            refillAmount = val
+            setAmmo(refillAmount)
+        end
+    end)
+
+    toggleLoopButton.MouseButton1Click:Connect(function()
+        autoRefillEnabled = not autoRefillEnabled
+        toggleLoopButton.Text = "Tự động làm mới: " .. (autoRefillEnabled and "BẬT" or "TẮT")
+        toggleLoopButton.BackgroundColor3 = autoRefillEnabled and Color3.fromRGB(60, 200, 80) or Color3.fromRGB(90, 90, 90)
+    end)
+
+    tab1Button.MouseButton1Click:Connect(function()
+        tab1.Visible = true
+        tab2.Visible = false
+        tab1Button.BackgroundColor3 = Color3.fromRGB(45, 45, 45)
+        tab2Button.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
+    end)
+
+    tab2Button.MouseButton1Click:Connect(function()
+        tab1.Visible = false
+        tab2.Visible = true
+        tab2Button.BackgroundColor3 = Color3.fromRGB(45, 45, 45)
+        tab1Button.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
+    end)
+
+    task.spawn(function()
+        while true do
+            if autoUpdate then setCooldown(cooldownValue) end
+            task.wait(2)
+        end
+    end)
+
+    RunService.RenderStepped:Connect(function()
+        if autoRefillEnabled and refillAmount > 0 then
+            setAmmo(refillAmount)
+        end
+    end)
 end
 
--- Xác thực mật khẩu
+-- CONFIRM PASSWORD
 confirmButton.MouseButton1Click:Connect(function()
-	if passBox.Text == correctPassword then
-		passwordGui:Destroy()
-		showMainGui()
-	else
-		passBox.Text = ""
-		passBox.PlaceholderText = "Chú ý lại mật khẩu"
-		passBox.PlaceholderColor3 = Color3.fromRGB(255, 100, 100)
-	end
+    if passBox.Text == correctPassword then
+        passwordGui:Destroy()
+        showMainGui()
+    else
+        passBox.Text = ""
+        passBox.PlaceholderText = "Vui lòng kiểm tra lại!"
+        passBox.PlaceholderColor3 = Color3.fromRGB(255, 100, 100)
+    end
 end)
