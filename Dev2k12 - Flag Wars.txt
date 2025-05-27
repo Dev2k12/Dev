@@ -71,14 +71,14 @@ local function showMainGui()
     title.BackgroundTransparency = 1
 
     local tab1Button = Instance.new("TextButton", frame)
-    tab1Button.Text = "Cooldown"
+    tab1Button.Text = "Tốc độ bắn"
     tab1Button.Size = UDim2.new(0.5, 0, 0, 30)
     tab1Button.Position = UDim2.new(0, 0, 0, 30)
     tab1Button.BackgroundColor3 = Color3.fromRGB(45, 45, 45)
     tab1Button.TextColor3 = Color3.new(1,1,1)
 
     local tab2Button = Instance.new("TextButton", frame)
-    tab2Button.Text = "Ammo"
+    tab2Button.Text = "Đạn"
     tab2Button.Size = UDim2.new(0.5, 0, 0, 30)
     tab2Button.Position = UDim2.new(0.5, 0, 0, 30)
     tab2Button.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
@@ -90,7 +90,7 @@ local function showMainGui()
     tab1.BackgroundTransparency = 1
 
     local inputBox1 = Instance.new("TextBox", tab1)
-    inputBox1.PlaceholderText = "Nhập cooldown (vd: 0.1)"
+    inputBox1.PlaceholderText = "Nhập tốc độ bắn"
     inputBox1.Font = Enum.Font.Gotham
     inputBox1.TextSize = 16
     inputBox1.Text = ""
@@ -100,7 +100,7 @@ local function showMainGui()
     inputBox1.TextColor3 = Color3.new(1, 1, 1)
 
     local setButton = Instance.new("TextButton", tab1)
-    setButton.Text = "Cập nhật Cooldown"
+    setButton.Text = "Cập nhật tốc độ bắn"
     setButton.Font = Enum.Font.GothamBold
     setButton.TextSize = 16
     setButton.Size = UDim2.new(1, -20, 0, 30)
